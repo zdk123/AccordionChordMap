@@ -28,8 +28,11 @@ export function AccordionLayout({ combinations, activeCombo }: AccordionLayoutPr
     if (row === 1 && activeButtons.bass.includes(col)) {
       return activeButtons.color;
     }
-    if (row >= 2 && activeButtons.chord.includes((row - 2) * 20 + col)) {
-      return activeButtons.color;
+    if (row >= 2) {
+      const buttonIndex = col + (row - 2) * 20; // Calculate button index based on row
+      if (activeButtons.chord.includes(buttonIndex)) {
+        return activeButtons.color;
+      }
     }
     return '#E5E7EB';
   };

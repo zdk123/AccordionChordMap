@@ -45,7 +45,7 @@ export function getButtonCombinations(root: string, chordType: ChordType): Butto
 
   switch(chordType.name) {
     case "7":
-      // Dominant 7th - uses root and dominant seventh button (Row 4)
+      // Dominant 7th - uses root and dominant seventh button
       combination = {
         counterbass: [],
         bass: [rootIndex],
@@ -56,7 +56,7 @@ export function getButtonCombinations(root: string, chordType: ChordType): Butto
       break;
 
     case "dim7":
-      // Diminished 7th - uses root and diminished seventh button (Row 5)
+      // Diminished 7th - uses root and diminished seventh button
       combination = {
         counterbass: [],
         bass: [rootIndex],
@@ -67,7 +67,7 @@ export function getButtonCombinations(root: string, chordType: ChordType): Butto
       break;
 
     case "maj7":
-      // Major 7th - compound chord using major (Row 2) + minor third above (Row 3)
+      // Major 7th - compound chord using major + minor third above
       combination = {
         counterbass: [],
         bass: [rootIndex],
@@ -81,12 +81,12 @@ export function getButtonCombinations(root: string, chordType: ChordType): Butto
       break;
 
     case "min":
-      // Minor triad (Row 3)
+      // Minor triad
       combination = {
         counterbass: [],
         bass: [rootIndex],
         chord: [rootIndex + 60], // Row 3 (Minor)
-        color: COLORS[0],
+        color: COLORS[1],
         notes: [
           root,
           `${STRADELLA_NOTES[(rootIndex + 3) % 20]}`,
@@ -96,7 +96,7 @@ export function getButtonCombinations(root: string, chordType: ChordType): Butto
       break;
 
     default:
-      // Major triad (Row 2)
+      // Major triad
       combination = {
         counterbass: [],
         bass: [rootIndex],
