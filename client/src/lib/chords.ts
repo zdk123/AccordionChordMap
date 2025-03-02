@@ -12,8 +12,11 @@ export type ButtonCombination = {
   notes: string[];
 };
 
-// Stradella bass system starts at Bbb (B double flat) and follows circle of fifths
-export const STRADELLA_NOTES = ['Bbb', 'F', 'C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#', 'F##', 'C##', 'G##', 'D##', 'A##'];
+// Stradella bass system starts at Bbb and follows circle of fifths
+export const STRADELLA_NOTES = [
+  'Bbb', 'Fb', 'Cb', 'Gb', 'Db', 'Ab', 'Eb', 'Bb', 'F', 'C', 
+  'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#'
+];
 
 export const CHORD_TYPES: ChordType[] = [
   { name: "maj", fullName: "Major", intervals: [0, 4, 7] },
@@ -46,7 +49,7 @@ export function getButtonCombinations(root: string, chordType: ChordType): Butto
       combination = {
         counterbass: [],
         bass: [rootIndex],
-        chord: [rootIndex + 80], // Dominant seventh button row
+        chord: [rootIndex + 80], // Row 4 (Dominant 7th)
         color: COLORS[2],
         notes: [root, `${STRADELLA_NOTES[(rootIndex + 4) % 20]}`, `${STRADELLA_NOTES[(rootIndex + 10) % 20]}`]
       };
@@ -57,7 +60,7 @@ export function getButtonCombinations(root: string, chordType: ChordType): Butto
       combination = {
         counterbass: [],
         bass: [rootIndex],
-        chord: [rootIndex + 100], // Diminished seventh button row
+        chord: [rootIndex + 100], // Row 5 (Diminished 7th)
         color: COLORS[3],
         notes: [root, `${STRADELLA_NOTES[(rootIndex + 3) % 20]}`, `${STRADELLA_NOTES[(rootIndex + 9) % 20]}`]
       };
@@ -69,8 +72,8 @@ export function getButtonCombinations(root: string, chordType: ChordType): Butto
         counterbass: [],
         bass: [rootIndex],
         chord: [
-          rootIndex + 40,  // Major chord button
-          ((rootIndex + 4) % 20) + 60  // Minor chord button for the third above
+          rootIndex + 40,  // Row 2 (Major)
+          ((rootIndex + 4) % 20) + 60  // Row 3 (Minor) for the third above
         ],
         color: COLORS[0],
         notes: [root, `${STRADELLA_NOTES[(rootIndex + 4) % 20]}`, `${STRADELLA_NOTES[(rootIndex + 7) % 20]}`, `${STRADELLA_NOTES[(rootIndex + 11) % 20]}`]
@@ -82,7 +85,7 @@ export function getButtonCombinations(root: string, chordType: ChordType): Butto
       combination = {
         counterbass: [],
         bass: [rootIndex],
-        chord: [rootIndex + 60], // Minor button row
+        chord: [rootIndex + 60], // Row 3 (Minor)
         color: COLORS[0],
         notes: [
           root,
@@ -97,7 +100,7 @@ export function getButtonCombinations(root: string, chordType: ChordType): Butto
       combination = {
         counterbass: [],
         bass: [rootIndex],
-        chord: [rootIndex + 40], // Major button row
+        chord: [rootIndex + 40], // Row 2 (Major)
         color: COLORS[0],
         notes: [
           root,
