@@ -9,6 +9,7 @@ export type ButtonCombination = {
   counterbass: number[];
   chord: number[];
   color: string;
+  notes: string[];  // Added to store all component notes
 };
 
 export const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
@@ -25,8 +26,8 @@ export const CHORD_TYPES: ChordType[] = [
 ];
 
 export const COLORS = [
-  "#FF6B6B", "#4ECDC4", "#45B7D1", "#96CEB4",
-  "#FFEEAD", "#D4A5A5", "#9B59B6", "#3498DB"
+  "#4A90E2", "#50C878", "#9B59B6", "#E74C3C",
+  "#F39C12", "#1ABC9C", "#34495E", "#7F8C8D"
 ];
 
 export function getChordNotes(root: string, chordType: ChordType): string[] {
@@ -36,18 +37,40 @@ export function getChordNotes(root: string, chordType: ChordType): string[] {
   );
 }
 
-export function getButtonCombinations(root: string, chordType: ChordType): ButtonCombination[] {
-  // This is a simplified version - in a real app we would have more combinations
-  const rootIndex = NOTES.indexOf(root);
-  const combinations: ButtonCombination[] = [];
-  
-  // Basic combination
-  combinations.push({
-    bass: [rootIndex],
-    counterbass: [],
-    chord: [rootIndex],
-    color: COLORS[0]
-  });
+// Stradella Bass System Layout Helper
+function getStradellaBassLayout() {
+  // In the Stradella system:
+  // Counter-bass row: Fundamental notes
+  // Bass row: The same notes as counter-bass but one octave higher
+  // Chord rows: Arranged in thirds for major/minor chords
 
-  return combinations;
+  const layout = {
+    counterbass: Array.from({ length: 20 }, (_, i) => i),
+    bass: Array.from({ length: 20 }, (_, i) => i),
+    chord: Array.from({ length: 80 }, (_, i) => i) // 4 rows × 20 columns
+  };
+
+  return layout;
+}
+
+export function getButtonCombinations(root: string, chordType: ChordType): ButtonCombination[] {
+  const rootIndex = NOTES.indexOf(root);
+  const notes = getChordNotes(root, chordType);
+  const layout = getStradellaBassLayout();
+
+  // For demonstration, returning a basic combination
+  // In a real implementation, this would map to actual Stradella bass button positions
+  const combination: ButtonCombination = {
+    counterbass: [rootIndex % 20],
+    bass: [rootIndex % 20],
+    chord: [
+      rootIndex % 20,
+      (rootIndex + 4) % 20,  // Major third
+      (rootIndex + 7) % 20   // Perfect fifth
+    ],
+    color: COLORS[0],
+    notes: notes
+  };
+
+  return [combination];
 }

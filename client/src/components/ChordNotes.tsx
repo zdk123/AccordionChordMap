@@ -1,4 +1,4 @@
-import { CHORD_TYPES, type ButtonCombination } from '@/lib/chords';
+import { CHORD_TYPES, getChordNotes, type ButtonCombination } from '@/lib/chords';
 
 interface ChordNotesProps {
   root: string;
@@ -14,16 +14,19 @@ export function ChordNotes({ root, type, combination }: ChordNotesProps) {
     <div className="mt-6 text-center">
       <h3 className="text-xl font-semibold mb-4">Notes in this combination:</h3>
       <div className="flex gap-4 justify-center items-center">
-        {chordType.intervals.map((interval, i) => (
+        {combination.notes.map((note, i) => (
           <div
-            key={interval}
+            key={i}
             className="px-4 py-2 rounded-lg text-white font-medium text-lg"
             style={{ backgroundColor: combination.color }}
           >
-            {root}
+            {note}
           </div>
         ))}
       </div>
+      <p className="mt-4 text-sm text-gray-600">
+        {chordType.fullName} chord
+      </p>
     </div>
   );
 }
