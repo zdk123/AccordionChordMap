@@ -1,5 +1,5 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { NOTES, CHORD_TYPES } from "@/lib/chords";
+import { STRADELLA_NOTES, CHORD_TYPES } from '@/lib/chords';
 
 interface ChordSelectorProps {
   selectedRoot: string;
@@ -21,7 +21,7 @@ export function ChordSelector({
           <SelectValue placeholder="Root" />
         </SelectTrigger>
         <SelectContent>
-          {NOTES.map(note => (
+          {STRADELLA_NOTES.map(note => (
             <SelectItem key={note} value={note}>
               {note}
             </SelectItem>

@@ -1,10 +1,19 @@
 import { useMemo } from 'react';
-import { type ButtonCombination } from '@/lib/chords';
+import { type ButtonCombination, STRADELLA_NOTES } from '@/lib/chords';
 
 interface AccordionLayoutProps {
   combinations: ButtonCombination[];
   activeCombo: number;
 }
+
+const ROW_LABELS = [
+  "Counter-bass (Major Third)",
+  "Root",
+  "Major",
+  "Minor",
+  "Dominant 7th",
+  "Diminished 7th"
+];
 
 export function AccordionLayout({ combinations, activeCombo }: AccordionLayoutProps) {
   const activeButtons = useMemo(() => {
@@ -23,75 +32,52 @@ export function AccordionLayout({ combinations, activeCombo }: AccordionLayoutPr
   const COLS = 20;
   const buttonRadius = 15;
   const spacing = 35;
-  const startX = 50;
+  const startX = 80; // Increased to accommodate row labels
   const startY = 50;
 
   return (
-    <svg viewBox={`0 0 ${startX * 2 + COLS * spacing} ${startY * 2 + 6 * spacing}`} className="w-full max-w-4xl mx-auto">
-      {/* Counter-bass buttons (first row) */}
-      {Array.from({ length: COLS }).map((_, i) => (
-        <g key={`counterbass-${i}`}>
-          <circle
-            cx={startX + i * spacing}
-            cy={startY}
-            r={buttonRadius}
-            fill={getButtonColor('counterbass', i)}
-            stroke="#374151"
-            strokeWidth="2"
-          />
-          <text 
-            x={startX + i * spacing} 
-            y={startY + buttonRadius * 2.5}
-            textAnchor="middle" 
-            className="text-xs"
-          >
-            {i + 1}
-          </text>
-        </g>
+    <svg 
+      viewBox={`0 0 ${startX * 2 + COLS * spacing} ${startY * 2 + 6 * spacing}`} 
+      className="w-full max-w-4xl mx-auto"
+    >
+      {/* Row labels */}
+      {ROW_LABELS.map((label, row) => (
+        <text
+          key={`label-${row}`}
+          x={10}
+          y={startY + row * spacing + 5}
+          className="text-xs font-medium"
+          textAnchor="start"
+        >
+          {label}
+        </text>
       ))}
 
-      {/* Bass buttons (second row) */}
-      {Array.from({ length: COLS }).map((_, i) => (
-        <g key={`bass-${i}`}>
-          <circle
-            cx={startX + i * spacing}
-            cy={startY + spacing}
-            r={buttonRadius}
-            fill={getButtonColor('bass', i)}
-            stroke="#374151"
-            strokeWidth="2"
-          />
-          <text 
-            x={startX + i * spacing} 
-            y={startY + spacing + buttonRadius * 2.5}
-            textAnchor="middle" 
-            className="text-xs"
-          >
-            {i + 1}
-          </text>
-        </g>
+      {/* Column labels (notes) */}
+      {STRADELLA_NOTES.map((note, col) => (
+        <text
+          key={`note-${col}`}
+          x={startX + col * spacing}
+          y={20}
+          textAnchor="middle"
+          className="text-xs font-medium"
+        >
+          {note}
+        </text>
       ))}
 
-      {/* Chord buttons (4 rows) */}
-      {Array.from({ length: 4 }).map((_, row) => (
+      {/* All 6 rows of buttons */}
+      {Array.from({ length: 6 }).map((_, row) => (
         Array.from({ length: COLS }).map((_, col) => (
-          <g key={`chord-${row}-${col}`}>
+          <g key={`button-${row}-${col}`}>
             <circle
               cx={startX + col * spacing}
-              cy={startY + (row + 2) * spacing}
+              cy={startY + row * spacing}
               r={buttonRadius}
-              fill={getButtonColor('chord', row * COLS + col)}
+              fill={row < 2 ? getButtonColor(row === 0 ? 'counterbass' : 'bass', col) : getButtonColor('chord', row * COLS + col - (2 * COLS))}
               stroke="#374151"
               strokeWidth="2"
             />
-            <text 
-              x={startX + col * spacing} 
-              y={startY + (row + 2) * spacing + buttonRadius * 2.5}
-              textAnchor="middle" 
-              className="text-xs"
-            >
-              {row * COLS + col + 1}
-            </text>
           </g>
         ))
       ))}

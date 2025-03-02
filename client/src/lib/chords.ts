@@ -9,20 +9,19 @@ export type ButtonCombination = {
   counterbass: number[];
   chord: number[];
   color: string;
-  notes: string[];  // Added to store all component notes
+  notes: string[];
 };
 
-export const NOTES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+// Stradella bass system starts at Bb (B double flat) and follows circle of fifths
+export const STRADELLA_NOTES = ['Bb', 'F', 'C', 'G', 'D', 'A', 'E', 'B', 'F#', 'C#', 'G#', 'D#', 'A#', 'E#', 'B#', 'F##', 'C##', 'G##', 'D##', 'A##'];
 
 export const CHORD_TYPES: ChordType[] = [
   { name: "maj", fullName: "Major", intervals: [0, 4, 7] },
   { name: "min", fullName: "Minor", intervals: [0, 3, 7] },
-  { name: "7", fullName: "Dominant 7th", intervals: [0, 4, 7, 10] },
-  { name: "maj7", fullName: "Major 7th", intervals: [0, 4, 7, 11] },
-  { name: "min7", fullName: "Minor 7th", intervals: [0, 3, 7, 10] },
-  { name: "dim", fullName: "Diminished", intervals: [0, 3, 6] },
-  { name: "aug", fullName: "Augmented", intervals: [0, 4, 8] },
-  { name: "dim7", fullName: "Diminished 7th", intervals: [0, 3, 6, 9] }
+  { name: "7", fullName: "Dominant 7th", intervals: [0, 4, 10] }, // No fifth
+  { name: "dim7", fullName: "Diminished 7th", intervals: [0, 3, 6, 9] },
+  { name: "maj7", fullName: "Major 7th", intervals: [0, 4, 7, 11] }, // Compound chord
+  { name: "min7", fullName: "Minor 7th", intervals: [0, 3, 7, 10] }  // Compound chord
 ];
 
 export const COLORS = [
@@ -30,47 +29,76 @@ export const COLORS = [
   "#F39C12", "#1ABC9C", "#34495E", "#7F8C8D"
 ];
 
-export function getChordNotes(root: string, chordType: ChordType): string[] {
-  const rootIndex = NOTES.indexOf(root);
-  return chordType.intervals.map(interval => 
-    NOTES[(rootIndex + interval) % 12]
-  );
-}
-
-// Stradella Bass System Layout Helper
-function getStradellaBassLayout() {
-  // In the Stradella system:
-  // Counter-bass row: Fundamental notes
-  // Bass row: The same notes as counter-bass but one octave higher
-  // Chord rows: Arranged in thirds for major/minor chords
-
-  const layout = {
-    counterbass: Array.from({ length: 20 }, (_, i) => i),
-    bass: Array.from({ length: 20 }, (_, i) => i),
-    chord: Array.from({ length: 80 }, (_, i) => i) // 4 rows × 20 columns
-  };
-
-  return layout;
+// Helper function to find index in Stradella layout
+function findStradellaIndex(note: string): number {
+  return STRADELLA_NOTES.findIndex(n => n === note);
 }
 
 export function getButtonCombinations(root: string, chordType: ChordType): ButtonCombination[] {
-  const rootIndex = NOTES.indexOf(root);
-  const notes = getChordNotes(root, chordType);
-  const layout = getStradellaBassLayout();
+  const rootIndex = findStradellaIndex(root);
+  if (rootIndex === -1) return [];
 
-  // For demonstration, returning a basic combination
-  // In a real implementation, this would map to actual Stradella bass button positions
-  const combination: ButtonCombination = {
-    counterbass: [rootIndex % 20],
-    bass: [rootIndex % 20],
-    chord: [
-      rootIndex % 20,
-      (rootIndex + 4) % 20,  // Major third
-      (rootIndex + 7) % 20   // Perfect fifth
-    ],
-    color: COLORS[0],
-    notes: notes
-  };
+  let combination: ButtonCombination;
+
+  switch(chordType.name) {
+    case "7":
+      // Dominant 7th - uses root, third, and seventh (no fifth)
+      combination = {
+        counterbass: [rootIndex],
+        bass: [rootIndex],
+        chord: [
+          rootIndex, // root
+          rootIndex, // major third button
+          rootIndex  // seventh button
+        ],
+        color: COLORS[2],
+        notes: [root, `${STRADELLA_NOTES[(rootIndex + 4) % 20]}`, `${STRADELLA_NOTES[(rootIndex + 10) % 20]}`]
+      };
+      break;
+
+    case "dim7":
+      // Diminished 7th - uses root, minor third, and diminished seventh (no fifth)
+      combination = {
+        counterbass: [rootIndex],
+        bass: [rootIndex],
+        chord: [
+          rootIndex, // root
+          rootIndex, // minor third button
+          rootIndex  // diminished seventh button
+        ],
+        color: COLORS[3],
+        notes: [root, `${STRADELLA_NOTES[(rootIndex + 3) % 20]}`, `${STRADELLA_NOTES[(rootIndex + 9) % 20]}`]
+      };
+      break;
+
+    case "maj7":
+      // Major 7th - compound chord using major + minor third above
+      combination = {
+        counterbass: [rootIndex],
+        bass: [rootIndex],
+        chord: [
+          rootIndex,  // Major chord button
+          (rootIndex + 4) % 20  // Minor chord button for the third above
+        ],
+        color: COLORS[0],
+        notes: [root, `${STRADELLA_NOTES[(rootIndex + 4) % 20]}`, `${STRADELLA_NOTES[(rootIndex + 7) % 20]}`, `${STRADELLA_NOTES[(rootIndex + 11) % 20]}`]
+      };
+      break;
+
+    default:
+      // Major/Minor triads
+      combination = {
+        counterbass: [rootIndex],
+        bass: [rootIndex],
+        chord: [rootIndex],
+        color: COLORS[0],
+        notes: [
+          root,
+          `${STRADELLA_NOTES[(rootIndex + (chordType.name === "min" ? 3 : 4)) % 20]}`,
+          `${STRADELLA_NOTES[(rootIndex + 7) % 20]}`
+        ]
+      };
+  }
 
   return [combination];
 }
