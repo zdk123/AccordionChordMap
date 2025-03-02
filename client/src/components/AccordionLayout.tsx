@@ -21,8 +21,14 @@ export function AccordionLayout({ combinations, activeCombo }: AccordionLayoutPr
     return combinations[activeCombo];
   }, [combinations, activeCombo]);
 
-  const getButtonColor = (section: 'bass' | 'counterbass' | 'chord', index: number) => {
-    if (activeButtons[section].includes(index)) {
+  const getButtonColor = (row: number, col: number) => {
+    if (row === 0 && activeButtons.counterbass.includes(col)) {
+      return activeButtons.color;
+    }
+    if (row === 1 && activeButtons.bass.includes(col)) {
+      return activeButtons.color;
+    }
+    if (row >= 2 && activeButtons.chord.includes((row - 2) * 20 + col)) {
       return activeButtons.color;
     }
     return '#E5E7EB';
@@ -74,7 +80,7 @@ export function AccordionLayout({ combinations, activeCombo }: AccordionLayoutPr
               cx={startX + col * spacing}
               cy={startY + row * spacing}
               r={buttonRadius}
-              fill={row < 2 ? getButtonColor(row === 0 ? 'counterbass' : 'bass', col) : getButtonColor('chord', row * COLS + col - (2 * COLS))}
+              fill={getButtonColor(row, col)}
               stroke="#374151"
               strokeWidth="2"
             />
