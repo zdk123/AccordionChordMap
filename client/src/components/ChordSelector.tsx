@@ -1,5 +1,11 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { STRADELLA_NOTES, CHORD_TYPES } from '@/lib/chords';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { STRADELLA_NOTES, CHORD_TYPES } from "@/lib/chords";
 
 interface ChordSelectorProps {
   selectedRoot: string;
@@ -12,7 +18,7 @@ export function ChordSelector({
   selectedRoot,
   selectedType,
   onRootChange,
-  onTypeChange
+  onTypeChange,
 }: ChordSelectorProps) {
   return (
     <div className="flex gap-4 items-center justify-center mb-8">
@@ -21,7 +27,7 @@ export function ChordSelector({
           <SelectValue placeholder="Root" />
         </SelectTrigger>
         <SelectContent>
-          {STRADELLA_NOTES.map(note => (
+          {STRADELLA_NOTES.map((note) => (
             <SelectItem key={note} value={note}>
               {note}
             </SelectItem>
@@ -34,9 +40,9 @@ export function ChordSelector({
           <SelectValue placeholder="Chord Type" />
         </SelectTrigger>
         <SelectContent>
-          {CHORD_TYPES.map(type => (
+          {CHORD_TYPES.map((type) => (
             <SelectItem key={type.name} value={type.name}>
-              {type.fullName}
+              {type.name}
             </SelectItem>
           ))}
         </SelectContent>

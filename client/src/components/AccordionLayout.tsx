@@ -1,40 +1,63 @@
-import { useMemo } from 'react';
-import { type ButtonCombination, STRADELLA_NOTES } from '@/lib/chords';
+import { useMemo } from "react";
+import { type ButtonCombination, STRADELLA_NOTES } from "@/lib/chords";
 
 interface AccordionLayoutProps {
   combinations: ButtonCombination[];
   activeCombo: number;
 }
 
-const ROW_LABELS = [
-  "Counter-bass (Major Third)",
-  "Root",
-  "Major",
-  "Minor",
-  "Dominant 7th",
-  "Diminished 7th"
-];
+const ROW_LABELS = ["Counter", "Root", "Major", "Minor", "Dom 7th", "Dim 7th"];
 
-export function AccordionLayout({ combinations, activeCombo }: AccordionLayoutProps) {
-  const activeButtons = useMemo(() => {
-    if (!combinations[activeCombo]) return { bass: [], counterbass: [], chord: [] };
-    return combinations[activeCombo];
-  }, [combinations, activeCombo]);
-
+export function AccordionLayout({
+  combinations,
+}: {
+  combinations: ButtonCombination[];
+}) {
   const getButtonColor = (row: number, col: number) => {
-    if (row === 0 && activeButtons.counterbass.includes(col)) {
-      return activeButtons.color;
-    }
-    if (row === 1 && activeButtons.bass.includes(col)) {
-      return activeButtons.color;
-    }
-    if (row >= 2) {
-      const buttonIndex = col + (row - 2) * 20; // Calculate button index based on row
-      if (activeButtons.chord.includes(buttonIndex)) {
-        return activeButtons.color;
+    for (const combo of combinations) {
+      if (row >= 2) {
+        const buttonIndex = col + (row - 2) * 20; // Calculate button index based on row
+        if (combo.chord.includes(buttonIndex)) {
+          return combo.color;
+        }
       }
     }
-    return '#E5E7EB';
+    return "#E5E7EB";
+  };
+
+  const getButtonStrokeWidth = (row: number, col: number) => {
+    for (const combo of combinations) {
+      if (
+        row === 1 &&
+        // Only have a thick border where roots button==alternatives
+        combo.rootIndex.join(" ") === combo.bass.join(" ") &&
+        combo.bass.includes(col)
+      ) {
+        return "4";
+      }
+    }
+    return "2";
+  };
+
+  const getButtonStroke = (row: number, col: number) => {
+    for (const combo of combinations) {
+      // bass row - create stroke for missing notes but don't overwrite root stroke
+      if (
+        row == 1 &&
+        !combo.rootIndex.includes(col) &&
+        combo.missingNotes.includes(col)
+      ) {
+        return combo.color;
+      }
+      // adjust to counterbass position
+      const missingNotesCounter = combo.missingNotes.map(
+        (note) => (((note - 4) % 12) + 12) % 12,
+      );
+      if (row == 0 && missingNotesCounter.includes(col)) {
+        return combo.color;
+      }
+    }
+    return "#374151";
   };
 
   // Constants for layout
@@ -45,8 +68,8 @@ export function AccordionLayout({ combinations, activeCombo }: AccordionLayoutPr
   const startY = 50;
 
   return (
-    <svg 
-      viewBox={`0 0 ${startX * 2 + COLS * spacing} ${startY * 2 + 6 * spacing}`} 
+    <svg
+      viewBox={`0 0 ${startX * 1.5 + COLS * spacing} ${startY * 2 + 4.5 * spacing}`}
       className="w-full max-w-4xl mx-auto"
     >
       {/* Row labels */}
@@ -76,7 +99,7 @@ export function AccordionLayout({ combinations, activeCombo }: AccordionLayoutPr
       ))}
 
       {/* All 6 rows of buttons */}
-      {Array.from({ length: 6 }).map((_, row) => (
+      {Array.from({ length: 6 }).map((_, row) =>
         Array.from({ length: COLS }).map((_, col) => (
           <g key={`button-${row}-${col}`}>
             <circle
@@ -84,12 +107,12 @@ export function AccordionLayout({ combinations, activeCombo }: AccordionLayoutPr
               cy={startY + row * spacing}
               r={buttonRadius}
               fill={getButtonColor(row, col)}
-              stroke="#374151"
-              strokeWidth="2"
+              stroke={getButtonStroke(row, col)}
+              strokeWidth={getButtonStrokeWidth(row, col)}
             />
           </g>
-        ))
-      ))}
+        )),
+      )}
     </svg>
   );
 }
