@@ -14,6 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { STRADELLA_NOTES, CHORD_TYPES } from "@/lib/chords";
 
 interface ChordSelectorProps {
@@ -50,26 +51,28 @@ export function ChordSelector({
           <Command>
             <CommandInput placeholder="Search root..." />
             <CommandEmpty>No root found.</CommandEmpty>
-            <CommandGroup>
-              {STRADELLA_NOTES.map((note) => (
-                <CommandItem
-                  key={note}
-                  value={note}
-                  onSelect={(currentValue) => {
-                    onRootChange(currentValue);
-                    setOpenRoot(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedRoot === note ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {note}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            <ScrollArea className="h-[200px]">
+              <CommandGroup>
+                {STRADELLA_NOTES.map((note) => (
+                  <CommandItem
+                    key={note}
+                    value={note}
+                    onSelect={(currentValue) => {
+                      onRootChange(currentValue);
+                      setOpenRoot(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        selectedRoot === note ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {note}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </ScrollArea>
           </Command>
         </PopoverContent>
       </Popover>
@@ -90,26 +93,28 @@ export function ChordSelector({
           <Command>
             <CommandInput placeholder="Search chord type..." />
             <CommandEmpty>No chord type found.</CommandEmpty>
-            <CommandGroup>
-              {CHORD_TYPES.map((type) => (
-                <CommandItem
-                  key={type.name}
-                  value={type.name}
-                  onSelect={(currentValue) => {
-                    onTypeChange(currentValue);
-                    setOpenType(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      selectedType === type.name ? "opacity-100" : "opacity-0"
-                    )}
-                  />
-                  {type.name}
-                </CommandItem>
-              ))}
-            </CommandGroup>
+            <ScrollArea className="h-[300px]">
+              <CommandGroup>
+                {CHORD_TYPES.map((type) => (
+                  <CommandItem
+                    key={type.name}
+                    value={type.name}
+                    onSelect={(currentValue) => {
+                      onTypeChange(currentValue);
+                      setOpenType(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        selectedType === type.name ? "opacity-100" : "opacity-0"
+                      )}
+                    />
+                    {type.name}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </ScrollArea>
           </Command>
         </PopoverContent>
       </Popover>
