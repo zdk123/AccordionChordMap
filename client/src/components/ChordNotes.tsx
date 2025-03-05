@@ -11,8 +11,14 @@ export function ChordNotes({ root, type, combination }: ChordNotesProps) {
   if (!chordType) return null;
 
   return (
-    <div className="mt-6 text-center">
-      {/* <h3 className="text-xl font-semibold mb-4">Notes in the alternative chords:</h3> */}
+    <div className="mt-6">
+      <div className="text-center mb-6 p-4 bg-gray-50 rounded-lg">
+        <h3 className="text-xl font-semibold mb-2">
+          {root} {chordType.fullName}
+        </h3>
+        <p className="text-gray-600">{chordType.description}</p>
+      </div>
+
       <table className="min-w-full">
         <thead>
           <tr>
@@ -22,7 +28,6 @@ export function ChordNotes({ root, type, combination }: ChordNotesProps) {
           </tr>
         </thead>
         <tbody>
-          {/* Iterate over combinations to create rows */}
           {combination.map((combo, index) => (
             <tr key={index}>
               <td className="px-4 py-2">
