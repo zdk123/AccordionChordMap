@@ -14,6 +14,7 @@ export default function Home() {
   const combinations = chordTypeObj
     ? getButtonCombinations(root, chordTypeObj)
     : [];
+  // don't display more than 4 options
   const displayedCombinations = combinations.slice(0, 4);
   return (
     <div className="min-h-screen bg-gray-50 py-12 px-4">
@@ -32,8 +33,8 @@ export default function Home() {
             />
 
             <AccordionLayout combinations={displayedCombinations} />
-
-            {combinations[activeCombo] && (
+            {/* combinations[activeCombo] &&  */}
+            {(
               <ChordNotes
                 root={root}
                 type={chordType}

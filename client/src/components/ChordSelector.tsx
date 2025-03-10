@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/popover";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { STRADELLA_NOTES, CHORD_TYPES } from "@/lib/chords";
+import { prettifyAccidentals } from "./AccordionLayout";
 
 interface ChordSelectorProps {
   selectedRoot: string;
@@ -55,7 +56,7 @@ export function ChordSelector({
               <CommandGroup>
                 {STRADELLA_NOTES.map((note) => (
                   <CommandItem
-                    key={note}
+                    key={prettifyAccidentals(note)}
                     value={note}
                     onSelect={(currentValue) => {
                       onRootChange(currentValue);
@@ -68,7 +69,7 @@ export function ChordSelector({
                         selectedRoot === note ? "opacity-100" : "opacity-0"
                       )}
                     />
-                    {note}
+                    {prettifyAccidentals(note)}
                   </CommandItem>
                 ))}
               </CommandGroup>

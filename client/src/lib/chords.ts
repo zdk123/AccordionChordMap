@@ -16,7 +16,8 @@ export type ButtonCombination = {
   chordType: string;
   color: string;
   notes: string[];
-  missingNotes: number[];
+  missingNotesBass: number[];
+  missingNotesCounterbass: number[];
   missingNotesStr: string[];
   missingCount: number;
 };
@@ -50,6 +51,29 @@ export const STRADELLA_NOTES = [
   "G#",
   "D#",
   "A#",
+];
+
+export const COUNTERBASS_STRADELLA_NOTES = [
+  "Db",
+  "Ab",
+  "Eb",
+  "Bb",
+  "F",
+  "C",
+  "G",
+  "D",
+  "A",
+  "E",
+  "B",
+  "F#",
+  "C#",
+  "G#",
+  "D#",
+  "A#",
+  "E#",
+  "B#",
+  "Fx",
+  "Cx",
 ];
 
 const NOTES: { [key: number]: string } = {
@@ -116,9 +140,10 @@ const KEYS_T = Object.entries(KEYS).reduce<{ [key: number]: string[] }>(
 );
 
 // Given a pitch, but equivilent representation of that pitch
-function findEquivNotes(pitch: string): string[] {
+export function findEquivNotes(pitch: string): string[] {
   const i = KEYS[pitch];
-  return KEYS_T[i];
+  // make sure the input pitch is first
+  return [pitch, ...KEYS_T[i].filter(note => note !== pitch)]
 }
 
 export const CHORD_TYPES: ChordType[] = [
@@ -1261,8 +1286,12 @@ export const COLORS = [
 ];
 
 // Helper function to find index in Stradella layout
-function findStradellaIndex(note: string): number {
+export function findStradellaIndex(note: string): number {
   return STRADELLA_NOTES.findIndex((n) => n === note);
+}
+
+export function findCounterStradellaIndex(note: string): number {
+  return COUNTERBASS_STRADELLA_NOTES.findIndex((n) => n === note);
 }
 
 export function getButtonCombinations(
@@ -1272,20 +1301,17 @@ export function getButtonCombinations(
   const rootIndex = findStradellaIndex(root);
   if (rootIndex === -1) return [];
 
-  // let combination: ButtonCombination;
-
   let chordNotes = CHORD_TYPES.find(
     (chord) => chord.name === chordType.name,
   )?.intervals;
+
   if (!chordNotes) {
     chordNotes = CHORD_TYPES[0].intervals;
   }
   const searchNotes = chordNotes.map((x) => x + KEYS[root]);
   const normalizedNotes = normalize(searchNotes);
-  // const normalizedNotesStr = nl2s(normalizedNotes);
-  // console.log(`Chord '${root}${chordType.name}' notes are: ${normalizedNotesStr.join(" ") }`);
+  const normalizedNotesStr = nl2s(normalizedNotes);
 
-  // let matches = [];
   let combinations = [];
   // First pass: collect all matching patterns
   for (const [buttonName, buttonNotes] of Object.entries(BUTTONS)) {
@@ -1320,29 +1346,27 @@ export function getButtonCombinations(
           chordTypeString = "Major";
       }
       // const currentIndex = findStradellaIndex(rootButton);
-      const missingNotesStr = nl2s(missingNotes);
       const roots = findEquivNotes(root).sort((a, b) => a.length - b.length);
       const rootsIndex = roots.map((n) => findStradellaIndex(n));
       const baseNotes = findEquivNotes(rootButton).sort(
-        (a, b) => a.length - b.length,
+        (a, b) => a === root ? -1 : b === root ? 1 : a.length - b.length,
       );
-      const baseNotesIndex = baseNotes.map((n) => findStradellaIndex(n));
+      const missingNotesStr = nl2s(missingNotes);
+      const baseNotesIndex = baseNotes.map((n) => findStradellaIndex(n)).filter((i) => i>=0) ;
+      const missingNotesIndex = missingNotesStr.map((n) => findEquivNotes(n)).flat()
       let combination: ButtonCombination = {
-        // counterbass: [],
         bass: baseNotesIndex,
         bassNote: baseNotes,
         chord: baseNotesIndex.map((i) => i + offset),
         root: roots,
         rootIndex: rootsIndex,
         chordType: chordTypeString,
-        color: "",
         notes: nl2s(buttonNotes),
-        missingNotes: missingNotesStr
-          .map((n) => findEquivNotes(n))
-          .flat()
-          .map((n) => findStradellaIndex(n)),
+        missingNotesBass: missingNotesIndex.map((n) => findStradellaIndex(n)),
+        missingNotesCounterbass: missingNotesIndex.map((n) => findCounterStradellaIndex(n)),
         missingNotesStr: missingNotesStr,
         missingCount: missingNotes.length,
+        color: "" // should be replaced
       };
       console.log(
         `Button ${rootButton}${chordTypeButton}, index ${rootIndex} has: ${combination.notes.join(" ")}; missing: ${combination.missingNotesStr.join(" ") || "None"}`,
@@ -1371,6 +1395,34 @@ export function getButtonCombinations(
   combinations.forEach((combination, index) => {
     combination.color = COLORS[index % COLORS.length];
   });
+
+  if (combinations.length === 0) {
+    const searchNotes = chordType.intervals.map((x) => x + KEYS[root] + 1);
+    const missingNotes = Array.from(normalize(searchNotes));
+    const normalizedNotesStr = nl2s(normalizedNotes);
+  
+    // const intervals = normalize(chordType.intervals.map(x => x + KEYS[root]));
+    const missingNotesAll = searchNotes.map((i) => findEquivNotes(STRADELLA_NOTES[i])).flat();
+    const missingNotesIndex = missingNotesAll.map((n) => findStradellaIndex(n))
+    const missingNotesCounter = missingNotesAll.map((n) => findCounterStradellaIndex(n));
+    const baseNotes = findEquivNotes(root);
+    const baseNotesIndex = baseNotes.map((n) => findStradellaIndex(n));
+    
+    combinations.push({
+      bass: baseNotesIndex,
+      bassNote: baseNotes,
+      chord: baseNotesIndex,
+      root: [root],
+      rootIndex: baseNotesIndex,
+      chordType: "",
+      notes: [],
+      missingNotesBass: missingNotesIndex,
+      missingNotesCounterbass: missingNotesCounter,
+      missingNotesStr: normalizedNotesStr,
+      missingCount: missingNotes.length,
+      color: COLORS[0]
+    });
+  }
 
   return combinations;
 }

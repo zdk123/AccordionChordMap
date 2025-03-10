@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { type ButtonCombination, STRADELLA_NOTES } from "@/lib/chords";
+import { type ButtonCombination, STRADELLA_NOTES, COUNTERBASS_STRADELLA_NOTES, findCounterStradellaIndex, findEquivNotes } from "@/lib/chords";
 
 interface AccordionLayoutProps {
   combinations: ButtonCombination[];
@@ -8,6 +8,12 @@ interface AccordionLayoutProps {
 
 const ROW_LABELS = ["Counter", "Root", "Major", "Minor", "Dom 7th", "Dim 7th"];
 
+export function prettifyAccidentals(note: string): string {
+  return note.replace(/b/g, '♭').replace(/#/g, '♯').replace(/x/g, '𝄪');
+}
+
+
+
 export function AccordionLayout({
   combinations,
 }: {
@@ -15,8 +21,8 @@ export function AccordionLayout({
 }) {
   const getButtonColor = (row: number, col: number) => {
     for (const combo of combinations) {
-      if (row >= 2) {
-        const buttonIndex = col + (row - 2) * 20; // Calculate button index based on row
+      if (row >= 2 && combo.chordType!="") {
+        const buttonIndex = col + (row - 2) * 20; // Calculate button index based on row and column
         if (combo.chord.includes(buttonIndex)) {
           return combo.color;
         }
@@ -45,15 +51,12 @@ export function AccordionLayout({
       if (
         row == 1 &&
         !combo.rootIndex.includes(col) &&
-        combo.missingNotes.includes(col)
+        combo.missingNotesBass.includes(col)
       ) {
         return combo.color;
       }
       // adjust to counterbass position
-      const missingNotesCounter = combo.missingNotes.map(
-        (note) => (((note - 4) % 12) + 12) % 12,
-      );
-      if (row == 0 && missingNotesCounter.includes(col)) {
+      if (row == 0 && combo.missingNotesCounterbass.includes(col)) {
         return combo.color;
       }
     }
@@ -86,7 +89,7 @@ export function AccordionLayout({
       ))}
 
       {/* Column labels (notes) */}
-      {STRADELLA_NOTES.map((note, col) => (
+      {/* {STRADELLA_NOTES.map((note, col) => (
         <text
           key={`note-${col}`}
           x={startX + col * spacing}
@@ -96,7 +99,7 @@ export function AccordionLayout({
         >
           {note}
         </text>
-      ))}
+      ))} */}
 
       {/* All 6 rows of buttons */}
       {Array.from({ length: 6 }).map((_, row) =>
@@ -110,6 +113,28 @@ export function AccordionLayout({
               stroke={getButtonStroke(row, col)}
               strokeWidth={getButtonStrokeWidth(row, col)}
             />
+            {row === 0 && (
+              <text
+                x={startX + col * spacing} 
+                y={startY + row * spacing + 5} 
+                key={`note-${col}`}
+                textAnchor="middle"
+                className="text-xs font-medium"
+              >
+              {prettifyAccidentals(COUNTERBASS_STRADELLA_NOTES[col])}
+            </text>
+            )}
+            {row === 1 && (
+              <text
+                x={startX + col * spacing} 
+                y={startY + row * spacing + 5} 
+                key={`note-${col}`}
+                textAnchor="middle"
+                className="text-xs font-medium"
+              >
+              {prettifyAccidentals(STRADELLA_NOTES[col])}
+            </text>
+            )}
           </g>
         )),
       )}
