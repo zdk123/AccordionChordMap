@@ -1347,19 +1347,23 @@ export function getButtonCombinations(
       }
       // const currentIndex = findStradellaIndex(rootButton);
       const roots = findEquivNotes(root).sort((a, b) => a.length - b.length);
-      const rootsIndex = roots.map((n) => findStradellaIndex(n));
+      const rootsIndex = roots.map((n) => findStradellaIndex(n)).filter((i) => i>=0);
       const baseNotes = findEquivNotes(rootButton).sort(
         (a, b) => a === root ? -1 : b === root ? 1 : a.length - b.length,
       );
       const missingNotesStr = nl2s(missingNotes);
-      const baseNotesIndex = baseNotes.map((n) => findStradellaIndex(n)).filter((i) => i>=0) ;
+      const baseNotesIndex = baseNotes
+        .map((n) => findEquivNotes(n))
+        .flat()
+        .map((n) => findStradellaIndex(n))
+        .filter((i) => i >= 0);
       const missingNotesIndex = missingNotesStr.map((n) => findEquivNotes(n)).flat()
       let combination: ButtonCombination = {
-        bass: baseNotesIndex,
+        bass: Array.from(new Set(baseNotesIndex)),
         bassNote: baseNotes,
         chord: baseNotesIndex.map((i) => i + offset),
         root: roots,
-        rootIndex: rootsIndex,
+        rootIndex: Array.from(new Set(rootsIndex)),
         chordType: chordTypeString,
         notes: nl2s(buttonNotes),
         missingNotesBass: missingNotesIndex.map((n) => findStradellaIndex(n)),
