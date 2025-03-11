@@ -1,6 +1,6 @@
 # Accordion Chord Map
 
-Based on the python script originally from (Mellowood.ca)[https://mellowood.ca/music/accordion/alternate-chords.html]
+Based on the python script originally from [Mellowood.ca](https://mellowood.ca/music/accordion/alternate-chords.html)
 
 > One big problem with accordion, especially when playing jazz and Latin, is that the chord buttons of left hand side are rather limiting. For one thing, the chord types are limited to major, minor, seventh and diminished. And, further, each chord has only three sounding notes (seventh and diminished drop the fifth).
 
